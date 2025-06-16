@@ -6,6 +6,6 @@ services:
     startCommand: gunicorn app:app
     envVars:
       - key: SUPABASE_URL
-        value: https://frlnokkvbdkfuthxlpmv.supabase.co/
+        value: https://tppoclzkphbksluumjbo.supabase.co/
       - key: SUPABASE_KEY
-        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZybG5va2t2YmRrZnV0aHhscG12Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAwNDk0ODksImV4cCI6MjA2NTYyNTQ4OX0.IEyI8M3Grn4oaBOzJcvK-6ikDR7bO449odpgtDqHo1U
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwcG9jbHprcGhia3NsdXVtamJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAwNjk5OTksImV4cCI6MjA2NTY0NTk5OX0.MC9__-qgDP-po_I_PCLjF4o-6Pi9mrQz-4baV0unGqU
