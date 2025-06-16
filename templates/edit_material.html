@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ 'แก้ไข' if material else 'เพิ่ม' }}วัสดุ | ระบบสต็อก</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Prompt', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <div class="bg-orange-500 w-10 h-10 rounded-md flex items-center justify-center text-white font-bold">
+                    🏗️
+                </div>
+                <span class="text-lg font-semibold text-gray-800">{{ 'แก้ไข' if material else 'เพิ่ม' }}วัสดุ</span>
+            </div>
+            <a href="{{ url_for('materials_view') }}" class="text-sm text-orange-600 hover:underline">← กลับหน้าวัสดุ</a>
+        </div>
+    </nav>
+
+    <!-- Form -->
+    <main class="max-w-xl mx-auto px-4 py-10">
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, msg in messages %}
+                    <div class="mb-4 text-center text-sm px-4 py-2 rounded-md
+                        {% if category == 'error' %}
+                            bg-red-100 text-red-700
+                        {% else %}
+                            bg-green-100 text-green-700
+                        {% endif %}">
+                        {{ msg }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h1 class="text-xl font-bold text-gray-800 mb-4">
+                {{ 'แก้ไขข้อมูลวัสดุ' if material else 'เพิ่มวัสดุใหม่' }}
+            </h1>
+
+            <form method="POST">
+
+                <!-- รหัสวัสดุ -->
+                <div class="mb-4">
+                    <label class="block mb-1 text-gray-700 font-medium">รหัสวัสดุ</label>
+                    <input type="text" name="code"
+                           value="{{ material.code if material else '' }}"
+                           placeholder="กรอกหรือปล่อยว่างเพื่อสร้างอัตโนมัติ"
+                           class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400">
+                </div>
+
+                <!-- ชื่อวัสดุ -->
+                <div class="mb-4">
+                    <label class="block mb-1 text-gray-700 font-medium">ชื่อวัสดุ</label>
+                    <input type="text" name="name" required
+                           value="{{ material.name if material else '' }}"
+                           class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400">
+                </div>
+
+                <!-- จำนวน -->
+                <div class="mb-4">
+                    <label class="block mb-1 text-gray-700 font-medium">จำนวน</label>
+                    <input type="number" name="quantity" min="0" required
+                           value="{{ material.quantity if material else '' }}"
+                           class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400">
+                </div>
+
+                <!-- หน่วย -->
+                <div class="mb-6">
+                    <label class="block mb-1 text-gray-700 font-medium">หน่วย</label>
+                <input list="unitOptions" name="unit" required
+       value="{{ material.unit if material else '' }}"
+       class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400">
+                    <datalist id="unitOptions">
+                        {% set options = [
+                            'กิโลกรัม', 'กรัม', 'ตัน',
+                            'ลิตร', 'มิลลิลิตร',
+                            'ถุง', 'ม้วน', 'แผ่น', 'อัน', 'กล่อง', 'ลัง', 'ขวด', 'ชิ้น',
+                            'เมตร', 'เซนติเมตร', 'มิลลิเมตร', 'ฟุต', 'นิ้ว',
+                            'เส้น', 'เสา', 'ท่อน', 'แท่ง', 'กระสอบ', 'ชุด',
+                            'แกลลอน', 'แพ็ค', 'ถัง', 'ขด'
+                        ] %}
+                        {% for option in options %}
+                            <option value="{{ option }}"></option>
+                        {% endfor %}
+                    </datalist>
+                </div>
+
+                <div class="flex justify-end">
+                    <button type="submit"
+                            class="bg-orange-500 hover:bg-orange-600 text-white font-medium px-6 py-2 rounded-md">
+                        บันทึก
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </main>
+
+</body>
+</html>

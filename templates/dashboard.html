@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>หน้าแรก | ระบบจัดการสต็อก</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Prompt', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+    
+    <!-- Navbar -->
+    <nav class="bg-white shadow sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <div class="bg-orange-500 w-10 h-10 rounded-md flex items-center justify-center text-white font-bold">
+                    🏗️
+                </div>
+                <span class="text-lg font-semibold text-gray-800">ระบบจัดการสต็อกงานก่อสร้าง</span>
+            </div>
+
+            <div class="flex items-center space-x-6 text-sm font-medium">
+                <a href="{{ url_for('dashboard') }}" class="text-orange-600 hover:underline">หน้าหลัก</a>
+                <a href="{{ url_for('materials_view') }}" class="hover:text-orange-500">ข้อมูลวัสดุ</a>
+                <a href="{{ url_for('stock_in') }}" class="hover:text-orange-500">รับเข้า</a>
+                <a href="{{ url_for('stock_out') }}" class="hover:text-orange-500">เบิกจ่าย</a>
+                <a href="{{ url_for('tracking') }}" class="hover:text-orange-500">ติดตามสถานะ</a>
+                {% if session['is_admin'] %}
+                    <a href="{{ url_for('admin_page') }}" class="hover:text-orange-500">Admin</a>
+                {% endif %}
+                <a href="{{ url_for('logout') }}" class="text-red-500 hover:underline">ออกจากระบบ</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main -->
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        <h1 class="text-2xl font-bold text-gray-800 mb-2">ยินดีต้อนรับ, {{ session['username'] }}</h1>
+        <p class="text-gray-600 mb-8">เลือกเมนูด้านบนเพื่อเริ่มจัดการข้อมูลวัสดุในคลัง</p>
+
+        <!-- Dashboard cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="bg-white rounded-lg shadow p-5 hover:shadow-md transition">
+                <h3 class="text-orange-600 font-semibold text-lg mb-2">ระบบจัดเก็บวัสดุ</h3>
+                <p class="text-gray-600">เพิ่ม แก้ไข หรือลบวัสดุที่ใช้ในงานก่อสร้าง</p>
+            </div>
+            <div class="bg-white rounded-lg shadow p-5 hover:shadow-md transition">
+                <h3 class="text-orange-600 font-semibold text-lg mb-2">ระบบรับเข้า-จ่ายออก</h3>
+                <p class="text-gray-600">บันทึกประวัติการนำเข้าและเบิกวัสดุในคลัง</p>
+            </div>
+            <div class="bg-white rounded-lg shadow p-5 hover:shadow-md transition">
+                <h3 class="text-orange-600 font-semibold text-lg mb-2">ติดตามสถานะสินค้า</h3>
+                <p class="text-gray-600">ดูข้อมูลสินค้าคงเหลือ และแจ้งเตือนสินค้าที่ใกล้หมด</p>
+            </div>
+        </div>
+
+        <div class="mt-10">
+            <h2 class="text-xl font-semibold text-gray-700 mb-3">สิทธิ์ผู้ใช้งาน:</h2>
+            <p class="text-gray-700">
+                {% if session['is_admin'] %}
+                    🛠️ คุณเข้าสู่ระบบในฐานะแอดมิน - สามารถจัดการข้อมูลทุกอย่างได้
+                {% else %}
+                    👤 คุณเข้าสู่ระบบในฐานะสมาชิกทั่วไป - ดูข้อมูลได้อย่างเดียว
+                {% endif %}
+            </p>
+        </div>
+    </main>
+
+</body>
+</html>

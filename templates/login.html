@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>เข้าสู่ระบบ | ระบบจัดการสต็อกงานก่อสร้าง</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Prompt', sans-serif;
+            background-image: url('/static/images/bg-login.jpg'); /* ปรับ path ให้ตรงกับที่คุณเก็บรูปไว้ */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen bg-gray-100 bg-opacity-80">
+    <div class="bg-white bg-opacity-90 p-8 rounded-xl shadow-md w-full max-w-md">
+        <div class="flex flex-col items-center mb-6">
+            <div class="bg-orange-500 text-white w-12 h-12 flex items-center justify-center rounded-md">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                     viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M5 5v14l7-7 7 7V5a2 2 0 00-2-2H7a2 2 0 00-2 2z"/>
+                </svg>
+            </div>
+            <h2 class="text-2xl font-semibold text-gray-800 mt-4">ระบบจัดการสต็อกงานก่อสร้าง</h2>
+            <p class="text-gray-500 mt-1">กรุณาเข้าสู่ระบบเพื่อใช้งาน</p>
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="mb-4 text-red-500 text-sm text-center">
+              {{ messages[0] }}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('login') }}" method="post">
+            <div class="mb-4">
+                <label for="username" class="block text-sm font-medium text-gray-700">ชื่อผู้ใช้</label>
+                <input type="text" name="username" id="username" required
+                       class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3
+                       focus:outline-none focus:ring-orange-500 focus:border-orange-500">
+            </div>
+            <div class="mb-6">
+                <label for="password" class="block text-sm font-medium text-gray-700">รหัสผ่าน</label>
+                <input type="password" name="password" id="password" required
+                       class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3
+                       focus:outline-none focus:ring-orange-500 focus:border-orange-500">
+            </div>
+            <button type="submit"
+                    class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-md transition duration-200">
+                เข้าสู่ระบบ
+            </button>
+        </form>
+    </div>
+</body>
+</html>

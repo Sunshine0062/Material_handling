@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8" />
+    <title>รับสินค้าเข้า | ระบบสต็อก</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600&display=swap" rel="stylesheet" />
+    <style>
+        body {
+            font-family: 'Prompt', sans-serif;
+        }
+        .table-scroll {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        thead tr th {
+            position: sticky;
+            top: 0;
+            background-color: #fff;
+            z-index: 10;
+            border-bottom: 2px solid #f97316;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <div class="bg-orange-500 w-10 h-10 rounded-md flex items-center justify-center text-white font-bold">🏗️</div>
+                <span class="text-lg font-semibold text-gray-800">รับสินค้าเข้า</span>
+            </div>
+            <a href="{{ url_for('dashboard') }}" class="text-sm text-orange-600 hover:underline">← กลับหน้าหลัก</a>
+        </div>
+    </nav>
+
+    <!-- Content -->
+    <main class="max-w-4xl mx-auto px-4 py-10">
+
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h1 class="text-xl font-bold text-gray-800 mb-4">บันทึกรับสินค้าเข้า</h1>
+
+            <form method="POST" class="space-y-4" id="stockInForm">
+                <div>
+                    <label class="block text-gray-700 font-medium mb-1" for="materialInput">เลือกวัสดุ</label>
+                    <input list="materialList" id="materialInput" name="material_code" required
+                           placeholder="พิมพ์รหัสหรือชื่อวัสดุ..."
+                           class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                           autocomplete="off" />
+                    <datalist id="materialList">
+                        {% for m in materials %}
+                            <option value="{{ m.code }} - {{ m.name }}"></option>
+                        {% endfor %}
+                    </datalist>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-medium mb-1" for="quantity">จำนวนที่รับเข้า</label>
+                    <input type="number" id="quantity" name="quantity" min="1" required
+                           class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400" />
+                </div>
+
+                <div class="text-right">
+                    <button type="submit"
+                            class="bg-orange-500 hover:bg-orange-600 text-white font-medium px-6 py-2 rounded-md">
+                        บันทึก
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- ประวัติการรับเข้า -->
+        <div class="mt-10">
+            <h2 class="text-lg font-semibold text-gray-800 mb-3">ประวัติการรับสินค้าเข้า</h2>
+            <div class="bg-white shadow rounded-lg overflow-x-auto">
+                <div class="table-scroll">
+                    <table class="min-w-full text-sm text-left">
+                        <thead class="bg-orange-50 text-orange-700">
+                            <tr>
+                                <th class="px-4 py-2">วันที่</th>
+                                <th class="px-4 py-2">รหัสวัสดุ</th>
+                                <th class="px-4 py-2">ชื่อวัสดุ</th>
+                                <th class="px-4 py-2">จำนวน</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in stock_logs if log.type == 'in' %}
+                            <tr class="border-t hover:bg-orange-50">
+                                <td class="px-4 py-2">{{ log.date }}</td>
+                                <td class="px-4 py-2 font-mono">{{ log.code }}</td>
+                                <td class="px-4 py-2">{{ log.name }}</td>
+                                <td class="px-4 py-2">{{ log.quantity }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center text-gray-500 py-4">ยังไม่มีประวัติการรับสินค้าเข้า</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+<script>
+    document.getElementById('stockInForm').addEventListener('submit', function(event) {
+        const input = document.getElementById('materialInput');
+        const val = input.value.trim();
+        if (!val.includes(' - ')) {
+            alert('กรุณาเลือกวัสดุจากรายการที่แนะนำ หรือพิมพ์ให้ถูกต้องตามรูปแบบ "รหัส - ชื่อวัสดุ"');
+            event.preventDefault();
+            return;
+        }
+        // แยกเอารหัสวัสดุ (ส่วนก่อน " - ")
+        const code = val.split(' - ')[0].trim();
+        input.value = code;  // แก้ค่าส่งจริงให้เป็นรหัสวัสดุ
+    });
+</script>
+
+</body>
+</html>

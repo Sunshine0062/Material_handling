@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>วัสดุในคลัง | ระบบสต็อก</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Prompt', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <div class="bg-orange-500 w-10 h-10 rounded-md flex items-center justify-center text-white font-bold">
+                    🏗️
+                </div>
+                <span class="text-lg font-semibold text-gray-800">วัสดุในคลัง</span>
+            </div>
+
+            <div class="flex items-center space-x-6 text-sm font-medium">
+                <a href="{{ url_for('dashboard') }}" class="hover:text-orange-500">หน้าหลัก</a>
+                <a href="{{ url_for('materials_view') }}" class="text-orange-600 font-semibold">ข้อมูลวัสดุ</a>
+                <a href="{{ url_for('stock_in') }}" class="hover:text-orange-500">รับเข้า</a>
+                <a href="{{ url_for('stock_out') }}" class="hover:text-orange-500">เบิกจ่าย</a>
+                <a href="{{ url_for('tracking') }}" class="hover:text-orange-500">ติดตาม</a>
+                {% if session['is_admin'] %}
+                    <a href="{{ url_for('admin_page') }}" class="hover:text-orange-500">Admin</a>
+                {% endif %}
+                <a href="{{ url_for('logout') }}" class="text-red-500 hover:underline">ออกจากระบบ</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main -->
+    <main class="max-w-6xl mx-auto px-4 py-8">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold text-gray-800">รายการวัสดุ</h1>
+            {% if session['is_admin'] %}
+            <a href="{{ url_for('edit_material') }}"
+               class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md font-medium">
+                + เพิ่มวัสดุ
+            </a>
+            {% endif %}
+        </div>
+
+        <!-- Search -->
+        <div class="mb-4">
+            <input type="text" id="searchInput" placeholder="ค้นหาโดยรหัสหรือชื่อวัสดุ..."
+                   class="w-full border border-gray-300 rounded-md py-2 px-4 focus:outline-none focus:ring-2 focus:ring-orange-400">
+        </div>
+
+        <!-- Table -->
+        <div class="overflow-x-auto bg-white rounded-lg shadow">
+            <table class="min-w-full text-left">
+                <thead class="bg-orange-50 text-orange-700">
+                    <tr>
+                        <th class="px-4 py-3">รหัสวัสดุ</th>
+                        <th class="px-4 py-3">ชื่อวัสดุ</th>
+                        <th class="px-4 py-3">จำนวน</th>
+                        <th class="px-4 py-3">หน่วย</th>
+                        {% if session['is_admin'] %}
+                        <th class="px-4 py-3 text-center">จัดการ</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody id="materialTable">
+                    {% for item in materials %}
+                    <tr class="border-t hover:bg-orange-50 transition">
+                        <td class="px-4 py-3">{{ item.code if item.code else '-' }}</td>
+                        <td class="px-4 py-3">{{ item.name }}</td>
+                        <td class="px-4 py-3">{{ item.quantity }}</td>
+                        <td class="px-4 py-3">{{ item.unit }}</td>
+                        {% if session['is_admin'] %}
+                        <td class="px-4 py-3 text-center">
+                            <a href="/edit-material/{{ loop.index0 }}" class="text-blue-600 hover:underline mr-2">แก้ไข</a>
+                            <a href="/delete-material/{{ loop.index0 }}" class="text-red-500 hover:underline"
+                               onclick="return confirm('คุณแน่ใจหรือไม่ว่าต้องการลบวัสดุนี้?');">ลบ</a>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center text-gray-500 py-4">ไม่มีวัสดุในระบบ</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        // ฟังก์ชันค้นหาแบบ realtime
+        document.getElementById("searchInput").addEventListener("keyup", function () {
+            const filter = this.value.toLowerCase();
+            const rows = document.querySelectorAll("#materialTable tr");
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(filter) ? "" : "none";
+            });
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: stock-management
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: SUPABASE_URL
+        value: https://frlnokkvbdkfuthxlpmv.supabase.co/
+      - key: SUPABASE_KEY
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZybG5va2t2YmRrZnV0aHhscG12Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAwNDk0ODksImV4cCI6MjA2NTYyNTQ4OX0.IEyI8M3Grn4oaBOzJcvK-6ikDR7bO449odpgtDqHo1U
