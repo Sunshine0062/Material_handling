@@ -54,25 +54,29 @@ def ensure_data_loaded():
         data_loaded = True
 
 def save_users():
-    supabase.table("users").delete().neq("username", "").execute()
     for u, d in users.items():
-        supabase.table("users").insert({
+        supabase.table("users").upsert({
             "username": u,
             "password": d["password"],
             "is_admin": d["is_admin"]
         }).execute()
 
+
 def save_materials():
-    supabase.table("materials").delete().neq("code", "").execute()
-    supabase.table("materials").insert(materials).execute()
+    try:
+        for m in materials:
+            supabase.table("materials").upsert(m).execute()
+        print("✅ Materials upserted.")
+    except Exception as e:
+        print("❌ Failed to save materials:", e)
 
 def save_stock_logs():
     try:
-        # ลบ key 'id' ออก ถ้ามีใน log
-        cleaned_logs = [{k: v for k, v in log.items() if k != "id"} for log in stock_logs]
-        supabase.table("stock_logs").delete().neq("code", "").execute()
-        supabase.table("stock_logs").insert(cleaned_logs).execute()
-        print("✅ Stock logs saved:", len(cleaned_logs))
+        for log in stock_logs:
+            # ลบ id ทิ้งถ้ามี เพราะ Supabase ใช้ id อัตโนมัติ
+            log_data = {k: v for k, v in log.items() if k != "id"}
+            supabase.table("stock_logs").insert(log_data).execute()
+        print("✅ Stock logs saved:", len(stock_logs))
     except Exception as e:
         print("❌ Failed to save stock logs:", e)
         flash("เกิดข้อผิดพลาดขณะบันทึกประวัติการเบิกวัสดุ", "error")
