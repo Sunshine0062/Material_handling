@@ -203,7 +203,48 @@ def stock_out():
 
     return render_template("stock_out.html", materials=materials, stock_logs=stock_logs)
 
-# คุณสามารถคัดลอกส่วน stock_in, edit-material, admin, tracking, ฯลฯ มาเติมต่อได้ตามเดิม
+@app.route("/stock-in", methods=["GET", "POST"])
+@admin_required
+def stock_in():
+    if request.method == "POST":
+        material_code = request.form.get("material_code")
+        quantity_str = request.form.get("quantity")
+
+        if not material_code:
+            flash("กรุณาเลือกวัสดุ")
+            return redirect(url_for("stock_in"))
+
+        try:
+            quantity = int(quantity_str)
+            if quantity <= 0:
+                flash("จำนวนต้องมากกว่า 0")
+                return redirect(url_for("stock_in"))
+        except:
+            flash("กรุณากรอกจำนวนเป็นตัวเลขที่ถูกต้อง")
+            return redirect(url_for("stock_in"))
+
+        material = next((m for m in materials if m["code"] == material_code), None)
+        if not material:
+            flash("ไม่พบวัสดุที่เลือก")
+            return redirect(url_for("stock_in"))
+
+        material["quantity"] += quantity
+
+        thai_time = datetime.now(pytz.timezone('Asia/Bangkok')).strftime("%Y-%m-%d %H:%M")
+        stock_logs.append({
+            "type": "in",
+            "code": material["code"],
+            "name": material["name"],
+            "quantity": quantity,
+            "date": thai_time
+        })
+
+        save_materials()
+        save_stock_logs()
+        flash(f'บันทึกการรับเข้า {material["name"]} จำนวน {quantity} {material["unit"]} เรียบร้อยแล้ว')
+        return redirect(url_for("stock_in"))
+
+    return render_template("stock_in.html", materials=materials, stock_logs=stock_logs)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
