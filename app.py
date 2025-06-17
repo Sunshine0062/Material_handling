@@ -186,9 +186,12 @@ def edit_material(index=None):
 @admin_required
 def delete_material(index):
     if index < len(materials):
-        materials.pop(index)
+        material_to_delete = materials.pop(index)
+        # ลบจาก Supabase โดยใช้รหัสวัสดุ
+        supabase.table("materials").delete().eq("code", material_to_delete["code"]).execute()
         save_materials()
     return redirect(url_for("materials_view"))
+
 
 @app.route("/admin-delete-material/<material_code>", methods=["POST"])
 @admin_required
@@ -196,10 +199,18 @@ def admin_delete_material(material_code):
     global materials, stock_logs
     materials = [m for m in materials if m["code"] != material_code]
     stock_logs = [log for log in stock_logs if log.get("code") != material_code]
-    flash(f"ลบวัสดุ {material_code} และข้อมูลที่เกี่ยวข้องทั้งหมดเรียบร้อยแล้ว", "success")
-    save_materials()
-    save_stock_logs()
+
+    # ลบวัสดุและ log จาก Supabase
+    try:
+        supabase.table("materials").delete().eq("code", material_code).execute()
+        supabase.table("stock_logs").delete().eq("code", material_code).execute()
+        flash(f"ลบวัสดุ {material_code} และข้อมูลที่เกี่ยวข้องเรียบร้อยแล้ว", "success")
+    except Exception as e:
+        print("❌ Error deleting from Supabase:", e)
+        flash("เกิดข้อผิดพลาดในการลบจาก Supabase", "error")
+
     return redirect(url_for("admin_page"))
+
 
 @app.route("/stock-in", methods=["GET", "POST"])
 @admin_required
