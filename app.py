@@ -70,8 +70,13 @@ def save_materials():
 
 
 def save_stock_logs():
-    supabase.table("stock_logs").delete().neq("code", "").execute()
-    supabase.table("stock_logs").insert(stock_logs).execute()
+    try:
+        supabase.table("stock_logs").delete().neq("code", "").execute()
+        supabase.table("stock_logs").insert(stock_logs).execute()
+        print("✅ Stock logs saved:", len(stock_logs))
+    except Exception as e:
+        print("❌ Failed to save stock logs:", e)
+        flash("เกิดข้อผิดพลาดขณะบันทึกประวัติการเบิกวัสดุ", "error")
 
 
 def save_data():
@@ -240,6 +245,8 @@ def stock_in():
 
 @app.route("/stock-out", methods=["GET", "POST"])
 @admin_required
+@app.route("/stock-out", methods=["GET", "POST"])
+@admin_required
 def stock_out():
     if request.method == "POST":
         material_input = request.form.get("material")
@@ -265,6 +272,13 @@ def stock_out():
             flash("กรุณากรอกจำนวนเป็นตัวเลขที่ถูกต้อง")
             return redirect(url_for("stock_out"))
 
+        if not requester:
+            flash("กรุณากรอกชื่อผู้เบิก")
+            return redirect(url_for("stock_out"))
+        if not project:
+            flash("กรุณากรอกชื่อโครงการหรือหน้างาน")
+            return redirect(url_for("stock_out"))
+
         material = next((m for m in materials if m["code"] == material_code), None)
         if not material:
             flash("ไม่พบวัสดุที่เลือก")
@@ -276,7 +290,7 @@ def stock_out():
 
         material["quantity"] -= quantity
 
-        stock_logs.append({
+        new_log = {
             "type": "out",
             "code": material["code"],
             "name": material["name"],
@@ -284,7 +298,10 @@ def stock_out():
             "requester": requester,
             "project": project,
             "date": datetime.now().strftime("%Y-%m-%d %H:%M")
-        })
+        }
+
+        stock_logs.append(new_log)
+        print("📝 เพิ่ม log เบิก:", new_log)
 
         save_materials()
         save_stock_logs()
