@@ -246,5 +246,7 @@ def stock_in():
 
     return render_template("stock_in.html", materials=materials, stock_logs=stock_logs)
 
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
