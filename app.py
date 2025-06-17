@@ -69,6 +69,7 @@ def save_materials():
 
 def save_stock_logs():
     try:
+        cleaned_logs = [{k: v for k, v in log.items() if k != "id"} for log in stock_logs]
         supabase.table("stock_logs").delete().neq("code", "").execute()
         supabase.table("stock_logs").insert(stock_logs).execute()
         print("✅ Stock logs saved:", len(stock_logs))
