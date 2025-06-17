@@ -245,8 +245,6 @@ def stock_in():
 
 @app.route("/stock-out", methods=["GET", "POST"])
 @admin_required
-@app.route("/stock-out", methods=["GET", "POST"])
-@admin_required
 def stock_out():
     if request.method == "POST":
         material_input = request.form.get("material")
