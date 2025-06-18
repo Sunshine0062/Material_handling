@@ -5,7 +5,7 @@ import os
 import pytz
 from supabase import create_client, Client
 from dotenv import load_dotenv
-import hashlib
+
 # ------------------- Load Environment -------------------
 load_dotenv()
 SUPABASE_URL = os.getenv("SUPABASE_URL")
