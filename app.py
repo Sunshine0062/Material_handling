@@ -5,7 +5,7 @@ import os
 import pytz
 from supabase import create_client, Client
 from dotenv import load_dotenv
-
+import hashlib
 # ------------------- Load Environment -------------------
 load_dotenv()
 SUPABASE_URL = os.getenv("SUPABASE_URL")
@@ -70,13 +70,21 @@ def save_materials():
     except Exception as e:
         print("❌ Failed to save materials:", e)
 
+def generate_log_id(log):
+    raw = f'{log.get("type", "")}_{log.get("code", "")}_{log.get("quantity", "")}_{log.get("date", "")}'
+    return hashlib.sha1(raw.encode()).hexdigest()
+
 def save_stock_logs():
     try:
         for log in stock_logs:
-            # ลบ id ทิ้งถ้ามี เพราะ Supabase ใช้ id อัตโนมัติ
+            # เตรียมข้อมูล log โดยไม่ใส่ id และเพิ่ม log_id ที่ไม่ซ้ำ
             log_data = {k: v for k, v in log.items() if k != "id"}
-            supabase.table("stock_logs").insert(log_data).execute()
-        print("✅ Stock logs saved:", len(stock_logs))
+            log_data["log_id"] = generate_log_id(log_data)
+
+            # อัปเดตข้อมูลซ้ำโดยไม่สร้างซ้ำ (ต้องแน่ใจว่า Supabase มี unique constraint ที่ log_id)
+            supabase.table("stock_logs").upsert(log_data, on_conflict=["log_id"]).execute()
+
+        print("✅ Stock logs upserted:", len(stock_logs))
     except Exception as e:
         print("❌ Failed to save stock logs:", e)
         flash("เกิดข้อผิดพลาดขณะบันทึกประวัติการเบิกวัสดุ", "error")
