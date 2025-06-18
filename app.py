@@ -70,21 +70,23 @@ def save_materials():
     except Exception as e:
         print("❌ Failed to save materials:", e)
 
-def generate_log_id(log):
-    raw = f'{log.get("type", "")}_{log.get("code", "")}_{log.get("quantity", "")}_{log.get("date", "")}'
-    return hashlib.sha1(raw.encode()).hexdigest()
-
 def save_stock_logs():
     try:
+        existing_logs = supabase.table("stock_logs").select("code, date, type").execute().data
+        existing_keys = {(log["code"], log["date"], log["type"]) for log in existing_logs}
+
+        inserted_count = 0
+
         for log in stock_logs:
-            # เตรียมข้อมูล log โดยไม่ใส่ id และเพิ่ม log_id ที่ไม่ซ้ำ
+            log_key = (log.get("code"), log.get("date"), log.get("type"))
+            if log_key in existing_keys:
+                continue
+
             log_data = {k: v for k, v in log.items() if k != "id"}
-            log_data["log_id"] = generate_log_id(log_data)
+            supabase.table("stock_logs").insert(log_data).execute()
+            inserted_count += 1
 
-            # อัปเดตข้อมูลซ้ำโดยไม่สร้างซ้ำ (ต้องแน่ใจว่า Supabase มี unique constraint ที่ log_id)
-            supabase.table("stock_logs").upsert(log_data, on_conflict=["log_id"]).execute()
-
-        print("✅ Stock logs upserted:", len(stock_logs))
+        print(f"✅ Stock logs saved (new): {inserted_count}")
     except Exception as e:
         print("❌ Failed to save stock logs:", e)
         flash("เกิดข้อผิดพลาดขณะบันทึกประวัติการเบิกวัสดุ", "error")
