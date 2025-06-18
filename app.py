@@ -369,10 +369,19 @@ def delete_user(username):
             flash("ไม่อนุญาตให้ลบตัวเอง", "error")
             return redirect(url_for("admin_page"))
 
+    # ลบจาก dictionary
     users.pop(username)
-    flash(f"ลบผู้ใช้ {username} เรียบร้อยแล้ว")
-    save_users()
+
+    # ลบจาก Supabase ด้วย
+    try:
+        supabase.table("users").delete().eq("username", username).execute()
+        flash(f"ลบผู้ใช้ {username} เรียบร้อยแล้ว", "success")
+    except Exception as e:
+        print("❌ Failed to delete user from Supabase:", e)
+        flash("เกิดข้อผิดพลาดขณะลบผู้ใช้ออกจากฐานข้อมูล", "error")
+
     return redirect(url_for("admin_page"))
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
